@@ -19,10 +19,9 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include <stdio.h>
-
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include <math.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -51,6 +50,7 @@ uint8_t cur_voltage;
 volatile uint8_t finished = 0;
 extern uint16_t ms;
 extern uint16_t muestras[12][1201];
+float r, y, error; // r=position we want to achive, y=position rn, error=r-y
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -104,52 +104,26 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_SET);
-  HAL_Delay(1000);
-  getVoltage(1, &htim3);
-  for (cur_voltage = 1; cur_voltage <= 12; cur_voltage++) {
-	  //generador de experimentos
+
 	  HAL_TIM_Encoder_Start(&htim1, TIM_CHANNEL_ALL);
 	  HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
 	  HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_2);
 	  HAL_TIM_Base_Start_IT(&htim2);
-	  // polling wait for finish
-	  while (!finished) HAL_Delay(100);
-	  finished = 0;
-  }
 
-  // halt everything
-  HAL_TIM_Base_Stop_IT(&htim2);
-  __HAL_TIM_SET_COUNTER(&htim2, 0);
-  HAL_TIM_PWM_Stop(&htim3, TIM_CHANNEL_1);
-  HAL_TIM_PWM_Stop(&htim3, TIM_CHANNEL_2);
-  HAL_TIM_Encoder_Stop(&htim1, TIM_CHANNEL_ALL);
-  __HAL_TIM_SET_COUNTER(&htim1, 0);
 
-  uint8_t w[100] = {0};
-  sprintf(w, "Start Positive Voltage Experiments\r\n");
-  HAL_UART_Transmit(&huart2, w, sizeof(w), 10);
-
-  for (int i = 0; i < 12; i++) {
-	  uint8_t e[100] = {0};
-	  sprintf(e, "Experiment %d\r\n", i+1);
-	  HAL_UART_Transmit(&huart2, e, sizeof(e), 10);
-	  for (int j = 0; j < 1201; j++) {
-		  uint8_t m[100] = {0};
-		  sprintf(m, "%d %d\r\n", j, muestras[i][j]);
-		  HAL_UART_Transmit(&huart2, m, sizeof(m), 10);
-		  //HAL_Delay(20);
-	  }
-  }
 
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  HAL_TIM_Encoder_Start(&htim1, TIM_CHANNEL_ALL); // for manual counter counting value
+
+  r = M_PI/2;
   while (1)
   {
     /* USER CODE END WHILE */
-
+	  y = getRad(&htim1);
+	  error = r-y;
+	  getVoltage(2*error, &htim3);
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
@@ -445,6 +419,13 @@ void getVoltage(float voltage, TIM_HandleTypeDef* tim1){
 		__HAL_TIM_SET_COMPARE(tim1, TIM_CHANNEL_1, 0);
 		__HAL_TIM_SET_COMPARE(tim1, TIM_CHANNEL_2, pulse);
 	}
+
+}
+
+float getRad(TIM_HandleTypeDef* tim1){
+
+	uint16_t cnt = __HAL_TIM_GET_COUNTER(tim1);
+	return (float) cnt/573;
 
 }
 

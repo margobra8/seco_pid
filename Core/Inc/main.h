@@ -57,6 +57,7 @@ void Error_Handler(void);
 /* USER CODE BEGIN EFP */
 
 void getVoltage(float voltage, TIM_HandleTypeDef* tim1);
+float getRad(TIM_HandleTypeDef* tim1);
 
 /* USER CODE END EFP */
 
