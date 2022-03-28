@@ -107,7 +107,7 @@ void TIM2_IRQHandler(void)
 	  __HAL_TIM_SET_COUNTER(&htim1, 0);
 
 	  // activar flag para el uart que envie
-	  getVoltage((cur_voltage+1), &htim3);
+	  setVoltage((cur_voltage+1), &htim3);
 	  ms = 0;
 	  finished = 1;
   } else {
@@ -115,7 +115,7 @@ void TIM2_IRQHandler(void)
   if (ms == 600) {
 	  // set voltage al nivel del voltage pero negativo
 	  // getvoltage
-	  getVoltage(0, &htim3);
+	  setVoltage(0, &htim3);
   }
 
   cnt1 = __HAL_TIM_GET_COUNTER(&htim1);

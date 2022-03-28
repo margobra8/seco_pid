@@ -104,26 +104,24 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_SET);
-
-	  HAL_TIM_Encoder_Start(&htim1, TIM_CHANNEL_ALL);
-	  HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
-	  HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_2);
-	  HAL_TIM_Base_Start_IT(&htim2);
-
-
+  HAL_TIM_Encoder_Start(&htim1, TIM_CHANNEL_ALL);
+  HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
+  HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_2);
 
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
 
-  r = M_PI/2;
+  r = M_PI;
+  __HAL_TIM_SET_COUNTER(&htim1, 0);
+  HAL_Delay(3000);
   while (1)
   {
     /* USER CODE END WHILE */
 	  y = getRad(&htim1);
 	  error = r-y;
-	  getVoltage(2*error, &htim3);
+	  setVoltage(5*error, &htim3);
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
@@ -400,7 +398,7 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN 4 */
 
-void getVoltage(float voltage, TIM_HandleTypeDef* tim1){
+void setVoltage(float voltage, TIM_HandleTypeDef* tim1){
 
 //	__HAL_TIM_SET_COMPARE(htim, TIM_CHANNEL_1, (pulse + CH1_FREQ));
 
@@ -425,7 +423,7 @@ void getVoltage(float voltage, TIM_HandleTypeDef* tim1){
 float getRad(TIM_HandleTypeDef* tim1){
 
 	uint16_t cnt = __HAL_TIM_GET_COUNTER(tim1);
-	return (float) cnt/573;
+	return (float) cnt/3600*2*M_PI;
 
 }
 
