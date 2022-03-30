@@ -214,9 +214,9 @@ void TIM2_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM2_IRQn 0 */
 
-	float y, error_k, error_dt, error_int = 0.0;
+	float y = getRad(&htim1);
+	float error_k, error_dt, error_int = 0.0;
 
-	y = getRad(&htim1);
 	if(cur_instant < NO_SAMPLES_CONTROLLER) {
 		buf_pos[cur_instant] = y;
 	} else {

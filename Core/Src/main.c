@@ -106,12 +106,13 @@ int main(void)
   error_last = r;
 
   __HAL_TIM_SET_COUNTER(&htim1, 0); // reset encoder value
-  HAL_TIM_Encoder_Start(&htim1, TIM_CHANNEL_ALL);
   HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
   HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_2);
   HAL_Delay(2000); // delay to allow motor to get to a complete stop
 
   // start 1ms periodic timer
+  __HAL_TIM_SET_COUNTER(&htim1, 0);
+  HAL_TIM_Encoder_Start(&htim1, TIM_CHANNEL_ALL);
   HAL_TIM_Base_Start_IT(&htim2);
 
   // wait for movement to finish
