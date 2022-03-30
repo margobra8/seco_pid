@@ -105,6 +105,7 @@ int main(void)
 
   HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_SET);
 
+
 	  HAL_TIM_Encoder_Start(&htim1, TIM_CHANNEL_ALL);
 	  HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
 	  HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_2);
@@ -397,7 +398,7 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN 4 */
 
-void getVoltage(float voltage, TIM_HandleTypeDef* tim1){
+void setVoltage(float voltage, TIM_HandleTypeDef* tim1){
 
 //	__HAL_TIM_SET_COMPARE(htim, TIM_CHANNEL_1, (pulse + CH1_FREQ));
 
@@ -422,7 +423,7 @@ void getVoltage(float voltage, TIM_HandleTypeDef* tim1){
 float getRad(TIM_HandleTypeDef* tim1){
 
 	uint16_t cnt = __HAL_TIM_GET_COUNTER(tim1);
-	return (float) cnt/573;
+	return (float) cnt/3600*2*M_PI;
 
 }
 

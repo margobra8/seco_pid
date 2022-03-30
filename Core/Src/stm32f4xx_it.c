@@ -102,10 +102,6 @@ void TIM2_IRQHandler(void)
   error = r-y;
   getVoltage(2*error, &htim3);
 
-  //sprintf(msg, "%d %d\r\n", ++ms, cnt1);
-
-  //HAL_UART_Transmit(&huart2, msg, sizeof(msg), 2);
-
   /* USER CODE END TIM2_IRQn 1 */
 
 }
