@@ -1,7 +1,7 @@
 #define NO_SAMPLES_CONTROLLER 4001
-#define KP 70
+#define KP 17
 #define KI 1
-#define KD 1
+#define KD 10
 #define REV_ENC_CNT 3600
-#define CONTROLLER_TYPE_SEL DERIVATIVE
+#define CONTROLLER_TYPE_SEL PROPORTIONAL
 #define DELTA_TIME 0.001

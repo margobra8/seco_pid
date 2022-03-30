@@ -254,7 +254,7 @@ void TIM2_IRQHandler(void)
 		setVoltage(KP*error_k + KI*error_int , &htim3);
 		break;
 	case PID:
-		setVoltage(KP*error_k + KD*error_dt + KI*error_int , &htim3);
+		setVoltage(KP*error_k + KI*error_int + KD*error_dt, &htim3);
 		break;
 	}
 
