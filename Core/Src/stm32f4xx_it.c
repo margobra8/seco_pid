@@ -20,9 +20,9 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "stm32f4xx_it.h"
-#include <stdio.h>
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "preproc.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -42,9 +42,8 @@
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN PV */
-uint16_t ms = 0;
-uint16_t cnt1 = 0;
-uint16_t muestras[12][1201] = {};
+float buf_pos[NO_SAMPLES_CONTROLLER];
+uint16_t cur_instant = 0;
 
 /* USER CODE END PV */
 
@@ -61,12 +60,12 @@ uint16_t muestras[12][1201] = {};
 /* External variables --------------------------------------------------------*/
 extern TIM_HandleTypeDef htim2;
 /* USER CODE BEGIN EV */
-extern UART_HandleTypeDef huart2;
 extern TIM_HandleTypeDef htim1;
 extern TIM_HandleTypeDef htim3;
 extern uint8_t cur_voltage;
 extern uint8_t finished;
-extern float r, y, error; // r=position we want to achive, y=position rn, error=r-y
+extern float r, y, error; // r=reference position, y=current position, error=r-y
+extern uint8_t FLAG_MOVEMENT_FINISHED;
 /* USER CODE END EV */
 
 /******************************************************************************/
@@ -90,22 +89,6 @@ void NMI_Handler(void)
 /**
   * @brief This function handles Hard fault interrupt.
   */
-void TIM2_IRQHandler(void)
-{
-  /* USER CODE BEGIN TIM2_IRQn 0 */
-
-  /* USER CODE END TIM2_IRQn 0 */
-  HAL_TIM_IRQHandler(&htim2);
-  /* USER CODE BEGIN TIM2_IRQn 1 */
-
-  y = getRad(&htim1);
-  error = r-y;
-  getVoltage(2*error, &htim3);
-
-  /* USER CODE END TIM2_IRQn 1 */
-
-}
-
 void HardFault_Handler(void)
 {
   /* USER CODE BEGIN HardFault_IRQn 0 */
@@ -226,6 +209,26 @@ void SysTick_Handler(void)
 /**
   * @brief This function handles TIM2 global interrupt.
   */
+void TIM2_IRQHandler(void)
+{
+  /* USER CODE BEGIN TIM2_IRQn 0 */
+
+	y = getRad(&htim1);
+	if(cur_instant < NO_SAMPLES_CONTROLLER) {
+		buf_pos[cur_instant++] = y;
+	} else {
+		FLAG_MOVEMENT_FINISHED = 1;
+	}
+	error = r-y;
+	setVoltage(KP*error, &htim3);
+
+  /* USER CODE END TIM2_IRQn 0 */
+  HAL_TIM_IRQHandler(&htim2);
+  /* USER CODE BEGIN TIM2_IRQn 1 */
+
+  /* USER CODE END TIM2_IRQn 1 */
+}
+
 /* USER CODE BEGIN 1 */
 
 /* USER CODE END 1 */

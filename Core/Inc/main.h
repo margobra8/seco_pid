@@ -49,15 +49,14 @@ extern "C" {
 
 /* USER CODE END EM */
 
-void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
-
 /* Exported functions prototypes ---------------------------------------------*/
 void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
 
-void setVoltage(float voltage, TIM_HandleTypeDef* tim1);
-float getRad(TIM_HandleTypeDef* tim1);
+void setVoltage(float voltage, TIM_HandleTypeDef* t);
+float getRad(TIM_HandleTypeDef* t);
+void uart_send_buffer(UART_HandleTypeDef* u, float* buf);
 
 /* USER CODE END EFP */
 

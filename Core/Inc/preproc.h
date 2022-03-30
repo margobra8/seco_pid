@@ -1,0 +1,3 @@
+#define NO_SAMPLES_CONTROLLER 4001
+#define KP 50
+#define REV_ENC_CNT 3600
