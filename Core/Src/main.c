@@ -109,7 +109,7 @@ int main(void)
 	  HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
 	  HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_2);
 	  HAL_TIM_Base_Start_IT(&htim2);
-
+	  r = M_PI/2;
 
 
   /* USER CODE END 2 */
@@ -117,13 +117,10 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
 
-  r = M_PI/2;
   while (1)
   {
     /* USER CODE END WHILE */
-	  y = getRad(&htim1);
-	  error = r-y;
-	  getVoltage(2*error, &htim3);
+
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */

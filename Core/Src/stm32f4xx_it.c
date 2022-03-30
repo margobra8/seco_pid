@@ -66,6 +66,7 @@ extern TIM_HandleTypeDef htim1;
 extern TIM_HandleTypeDef htim3;
 extern uint8_t cur_voltage;
 extern uint8_t finished;
+extern float r, y, error; // r=position we want to achive, y=position rn, error=r-y
 /* USER CODE END EV */
 
 /******************************************************************************/
@@ -97,36 +98,16 @@ void TIM2_IRQHandler(void)
   HAL_TIM_IRQHandler(&htim2);
   /* USER CODE BEGIN TIM2_IRQn 1 */
 
-  if (ms > 1200) {
-	  // mandar una interrupcion para que el uart envie el buffer por consola y aparte apagar el timer y resetearlo
-	  HAL_TIM_Base_Stop_IT(&htim2);
-	  __HAL_TIM_SET_COUNTER(&htim2, 0);
-	  HAL_TIM_PWM_Stop(&htim3, TIM_CHANNEL_1);
-	  HAL_TIM_PWM_Stop(&htim3, TIM_CHANNEL_2);
-	  HAL_TIM_Encoder_Stop(&htim1, TIM_CHANNEL_ALL);
-	  __HAL_TIM_SET_COUNTER(&htim1, 0);
-
-	  // activar flag para el uart que envie
-	  getVoltage((cur_voltage+1), &htim3);
-	  ms = 0;
-	  finished = 1;
-  } else {
-
-  if (ms == 600) {
-	  // set voltage al nivel del voltage pero negativo
-	  // getvoltage
-	  getVoltage(0, &htim3);
-  }
-
-  cnt1 = __HAL_TIM_GET_COUNTER(&htim1);
-  muestras[cur_voltage-1][ms++] = cnt1;
+  y = getRad(&htim1);
+  error = r-y;
+  getVoltage(2*error, &htim3);
 
   //sprintf(msg, "%d %d\r\n", ++ms, cnt1);
 
   //HAL_UART_Transmit(&huart2, msg, sizeof(msg), 2);
 
   /* USER CODE END TIM2_IRQn 1 */
-}
+
 }
 
 void HardFault_Handler(void)
