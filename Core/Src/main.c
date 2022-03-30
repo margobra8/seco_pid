@@ -119,6 +119,7 @@ int main(void)
   while (!FLAG_MOVEMENT_FINISHED) HAL_Delay(100);
 
   HAL_TIM_Base_Stop_IT(&htim2);
+  setVoltage(0, &htim3);
   FLAG_MOVEMENT_FINISHED = 0;
   uart_send_buffer(&huart2, buf_pos);
 
