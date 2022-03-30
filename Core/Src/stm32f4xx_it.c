@@ -64,7 +64,7 @@ extern TIM_HandleTypeDef htim1;
 extern TIM_HandleTypeDef htim3;
 extern uint8_t cur_voltage;
 extern uint8_t finished;
-extern float r, y, error; // r=reference position, y=current position, error=r-y
+extern float r, error_sum, error_last; // r=reference position, y=current position, error=r-y
 extern uint8_t FLAG_MOVEMENT_FINISHED;
 extern enum ControllerType controller_type;
 /* USER CODE END EV */
@@ -214,27 +214,54 @@ void TIM2_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM2_IRQn 0 */
 
+	float y, error_k, error_dt, error_int = 0.0;
+
+	y = getRad(&htim1);
 	if(cur_instant < NO_SAMPLES_CONTROLLER) {
-		y = getRad(&htim1);
-		buf_pos[cur_instant++] = y;
+		buf_pos[cur_instant] = y;
 	} else {
 		FLAG_MOVEMENT_FINISHED = 1;
-		return;
 	}
 
 	// set error function and motor voltage depending on current controller
+	error_k = r-y;
+
+	//compute controller variables
 	switch (controller_type) {
-	case PROPORTIONAL:
-		error = r-y;
-		setVoltage(KP*error, &htim3);
-		break;
 	case DERIVATIVE:
+		error_dt = (error_k - error_last)/DELTA_TIME;
 		break;
 	case INTEGRAL:
+		error_int = DELTA_TIME * error_sum;
 		break;
 	case PID:
+		error_dt = (error_k - error_last)/DELTA_TIME;
+		error_int = DELTA_TIME * error_sum;
+		break;
+	case PROPORTIONAL:
 		break;
 	}
+
+	//Controller to actuation
+	switch (controller_type) {
+	case PROPORTIONAL:
+		setVoltage(KP*error_k, &htim3);
+		break;
+	case DERIVATIVE:
+		setVoltage(KP*error_k + KD*error_dt , &htim3);
+		break;
+	case INTEGRAL:
+		setVoltage(KP*error_k + KI*error_int , &htim3);
+		break;
+	case PID:
+		setVoltage(KP*error_k + KD*error_dt + KI*error_int , &htim3);
+		break;
+	}
+
+	// update values for next computation
+	error_last = error_k;
+	error_sum += error_k;
+	cur_instant++;
 
   /* USER CODE END TIM2_IRQn 0 */
   HAL_TIM_IRQHandler(&htim2);

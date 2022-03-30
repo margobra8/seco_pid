@@ -36,7 +36,7 @@ extern "C" {
 
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
-
+enum ControllerType {PROPORTIONAL, DERIVATIVE, INTEGRAL, PID};
 /* USER CODE END ET */
 
 /* Exported constants --------------------------------------------------------*/

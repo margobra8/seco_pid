@@ -47,9 +47,9 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-float r, y, error; // r=reference position, y=current position, error=r-y
+float r, error_sum, error_last = 0; // r=reference position, y=current position, error=r-y
 uint8_t FLAG_MOVEMENT_FINISHED = 0;
-enum ControllerType {PROPORTIONAL, DERIVATIVE, INTEGRAL, PID} controller_type = CONTROLLER_TYPE_SEL;
+enum ControllerType controller_type = CONTROLLER_TYPE_SEL;
 
 //external variables
 extern float buf_pos[NO_SAMPLES_CONTROLLER];
@@ -103,6 +103,7 @@ int main(void)
   HAL_GPIO_WritePin(GPIOA, GPIO_PIN_10, GPIO_PIN_SET);
 
   r = M_PI/2;
+  error_last = r;
 
   __HAL_TIM_SET_COUNTER(&htim1, 0); // reset encoder value
   HAL_TIM_Encoder_Start(&htim1, TIM_CHANNEL_ALL);
@@ -209,8 +210,8 @@ float getRad(TIM_HandleTypeDef* t){
 
 void uart_send_buffer(UART_HandleTypeDef* u, float* buf) {
 	for (int i = 0; i < NO_SAMPLES_CONTROLLER; i++) {
-		char m[100] = {0};
-		sprintf(m, "%d %.5f\r\n", i, buf[i]);
+		uint8_t m[100] = {0};
+		sprintf((char*) m, "%d %.5f\r\n", i, buf[i]);
 		HAL_UART_Transmit(u, m, sizeof(m), 10);
 	}
 }
