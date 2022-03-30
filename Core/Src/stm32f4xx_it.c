@@ -66,6 +66,7 @@ extern uint8_t cur_voltage;
 extern uint8_t finished;
 extern float r, y, error; // r=reference position, y=current position, error=r-y
 extern uint8_t FLAG_MOVEMENT_FINISHED;
+extern enum ControllerType controller_type;
 /* USER CODE END EV */
 
 /******************************************************************************/
@@ -213,14 +214,27 @@ void TIM2_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM2_IRQn 0 */
 
-	y = getRad(&htim1);
 	if(cur_instant < NO_SAMPLES_CONTROLLER) {
+		y = getRad(&htim1);
 		buf_pos[cur_instant++] = y;
 	} else {
 		FLAG_MOVEMENT_FINISHED = 1;
+		return;
 	}
-	error = r-y;
-	setVoltage(KP*error, &htim3);
+
+	// set error function and motor voltage depending on current controller
+	switch (controller_type) {
+	case PROPORTIONAL:
+		error = r-y;
+		setVoltage(KP*error, &htim3);
+		break;
+	case DERIVATIVE:
+		break;
+	case INTEGRAL:
+		break;
+	case PID:
+		break;
+	}
 
   /* USER CODE END TIM2_IRQn 0 */
   HAL_TIM_IRQHandler(&htim2);

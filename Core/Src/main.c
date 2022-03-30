@@ -49,6 +49,7 @@
 /* USER CODE BEGIN PV */
 float r, y, error; // r=reference position, y=current position, error=r-y
 uint8_t FLAG_MOVEMENT_FINISHED = 0;
+enum ControllerType {PROPORTIONAL, DERIVATIVE, INTEGRAL, PID} controller_type = CONTROLLER_TYPE_SEL;
 
 //external variables
 extern float buf_pos[NO_SAMPLES_CONTROLLER];
